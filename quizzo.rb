@@ -144,7 +144,6 @@ class HasDigitPred
 end
 
 
-
 class GreaterThanFactory
   def try_derive(universe)
     pivot = universe[ rand(universe.size) ]
@@ -175,29 +174,22 @@ end
 
 class MultipleOfFactory
   def try_derive(universe)
-    return nil if universe.size < 2
-
     # Try to choose a factor of
     # some but not all of the numbers
     # in the universe
     pivot = universe[ rand(universe.size) ]
-    #$stderr.puts "Pivot on #{pivot}"
-    nt_factors = find_nontrivial_factors(pivot)
-    return nil if nt_factors.empty?
+    factors = find_nontrivial_factors(pivot)
+    return nil if factors.empty?
 
-    factor = nt_factors[ rand(nt_factors.size) ]
+    factor = factors[ rand(factors.size) ]
     pred = MultipleOfPredicate.new(factor)
-    #$stderr.puts "Factor #{factor} -> '#{pred.to_s}'"
-    #assert pred.test(pivot)
 
     # Confirm that at least one number in the
     # universe is excluded by this factor
-    universe.each do |u|
-      next if pred.test(u)
-      #$stderr.puts "'#{pred.to_s}' excludes #{u} from universe"
+    counter_example = universe.find_index {|u| !pred.test(u) }
+    if counter_example
       return pred
     end
-
     nil
   end
 
@@ -267,9 +259,12 @@ range = IntegerWidthPredicate.new(WIDTH)
 universe = range.enumerate
 
 preds = [range]
-factories = [MultipleOfFactory.new, GreaterThanFactory.new,
-             LessThanFactory.new, FirstDigitLessThanLastDigitFactory.new,
-             DigitsSumFactory.new, HasDigitFactory.new]
+factories = [MultipleOfFactory.new,
+             #GreaterThanFactory.new,
+             #LessThanFactory.new,
+             FirstDigitLessThanLastDigitFactory.new,
+             DigitsSumFactory.new,
+             HasDigitFactory.new]
 until universe.size < 2
   #$stderr.puts "Universe size: #{universe.size}"
 
@@ -288,6 +283,7 @@ puts "There are #{preds.size} constraints on a secret number."
 puts "First, #{preds.first.to_s}"
 
 count_guesses = 0
+double_hint = false
 correct = false
 known = [preds.first]
 until correct
@@ -307,11 +303,20 @@ until correct
       conjunct = 'and, '
     end
 
-    few_hints = hints.sort{|a,b| rand(3)-1}.take(3)
-    puts "Maybe #{few_hints.join ', '}?"
+    # If there's a unique solution, don't reveal it unless
+    # the user 'double hints'
+    if hints.size==1 and !double_hint
+      puts "I don't want to spoil the surpise"
+      puts "type hint again if you really want to know"
+      double_hint = true
+    else
+      few_hints = hints.sort{|a,b| rand(3)-1}.take(3)
+      puts "Maybe #{few_hints.join ', '}?"
+    end
     next
   end
 
+  double_hint = false
   guess = guess.to_i
 
   # Check the input against all the clues,
