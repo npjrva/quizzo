@@ -11,7 +11,7 @@ class IntegerWidthPredicate
   end
 
   def to_s
-    "The number is a #{width}-digit integer"
+    "the secret is a #{width}-digit integer"
   end
 
   def test(i)
@@ -37,7 +37,7 @@ class MultipleOfPredicate
   end
 
   def to_s
-    "The number is a multiple of #{n}"
+    "the secret is a multiple of #{n}"
   end
 
   def test(i)
@@ -52,7 +52,7 @@ class GreaterThanPredicate
   end
 
   def to_s
-    "The number is a greater than #{n}"
+    "the secret is a greater than #{n}"
   end
 
   def test(i)
@@ -67,7 +67,7 @@ class LessThanPredicate
   end
 
   def to_s
-    "The number is a less than #{n}"
+    "the secret is a less than #{n}"
   end
 
   def test(i)
@@ -93,10 +93,29 @@ class FirstDigitLessThanLastDigitPred
 
   def to_s
     if reverse
-      return "The first digit is greater than the last digit"
+      return "the first digit of the secret is greater than the last digit"
     else
-      return "The first digit is less than the last digit"
+      return "the first digit of the secret is less than the last digit"
     end
+  end
+end
+
+class SumOfDigitsPred
+  attr_reader :sum
+  def initialize(sum)
+    @sum = sum
+  end
+
+  def to_s
+    "the digits of the secret sum to #{sum}"
+  end
+
+  def test(i)
+    sum == SumOfDigitsPred.hash(i)
+  end
+
+  def self.hash(n)
+    n.to_s.split(//).map{|c| c.to_i}.sum
   end
 end
 
@@ -177,8 +196,25 @@ class FirstDigitLessThanLastDigitFactory
   def try_derive(universe)
     pred = FirstDigitLessThanLastDigitPred.new( rand(2) == 0 )
     example = universe.find_index {|u| pred.test(u) }
+    if example
+      counter_example = universe.find_index {|u| !pred.test(u) }
+      if counter_example
+        return pred
+      end
+    end
+    nil
+  end
+end
+
+class DigitsSumFactory
+  def try_derive(universe)
+    pivot = universe[ rand(universe.size) ]
+    sum = SumOfDigitsPred.hash(pivot)
+    pred = SumOfDigitsPred.new(sum)
     counter_example = universe.find_index {|u| !pred.test(u) }
-    return pred if example and counter_example
+    if counter_example
+      return pred
+    end
     nil
   end
 end
@@ -189,7 +225,7 @@ range = IntegerWidthPredicate.new(WIDTH)
 universe = range.enumerate
 
 preds = [range]
-factories = [MultipleOfFactory.new, GreaterThanFactory.new, LessThanFactory.new, FirstDigitLessThanLastDigitFactory.new]
+factories = [MultipleOfFactory.new, GreaterThanFactory.new, LessThanFactory.new, FirstDigitLessThanLastDigitFactory.new, DigitsSumFactory.new]
 until universe.size < 2
   #$stderr.puts "Universe size: #{universe.size}"
 
