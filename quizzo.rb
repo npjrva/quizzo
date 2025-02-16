@@ -120,17 +120,26 @@ class SumOfDigitsPred
 end
 
 class HasDigitPred
-  attr_reader :digit
-  def initialize(digit)
+  attr_reader :digit, :reverse
+  def initialize(digit, reverse)
     @digit = digit.to_s
+    @reverse = reverse
   end
 
   def to_s
-    "the secret contains the digit '#{digit}'"
+    if reverse
+      "the secret does NOT contain the digit '#{digit}'"
+    else
+      "the secret contains the digit '#{digit}'"
+    end
   end
 
   def test(i)
-    i.to_s.include? digit
+    if reverse
+      return !(i.to_s.include? digit)
+    else
+      return i.to_s.include? digit
+    end
   end
 end
 
@@ -239,7 +248,7 @@ end
 class HasDigitFactory
   def try_derive(universe)
     digit = rand(10)
-    pred = HasDigitPred.new(digit)
+    pred = HasDigitPred.new(digit, rand(2)==0)
     example = universe.find_index {|u| pred.test(u) }
     if example
       counter_example = universe.find_index {|u| !pred.test(u) }
@@ -291,9 +300,11 @@ until correct
   elsif guess == 'hint'
     hints = known.first.enumerate
     puts "Let's see..."
+    conjunct = ''
     for k in known
       hints = hints.keep_if {|u| k.test(u) }
-      puts "and, #{k.to_s}, so #{hints.size} possibilities"
+      puts "#{conjunct}#{k.to_s}, so #{hints.size} possibilities"
+      conjunct = 'and, '
     end
 
     few_hints = hints.sort{|a,b| rand(3)-1}.take(3)
@@ -338,6 +349,15 @@ if correct
     puts "You solved it on your first try"
   else
     puts "You solved it in #{count_guesses} guesses (versus #{preds.size} clues)"
+  end
+
+  hints = known.first.enumerate
+  for k in known
+    hints = hints.keep_if {|u| k.test(u) }
+  end
+  if hints.size > 1
+    puts "Given what you knew so far, there are #{hints.size} possible solutions"
+    puts "Such as #{hints.take(3).join ', '}"
   end
 end
 
