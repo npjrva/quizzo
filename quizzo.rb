@@ -119,6 +119,23 @@ class SumOfDigitsPred
   end
 end
 
+class HasDigitPred
+  attr_reader :digit
+  def initialize(digit)
+    @digit = digit.to_s
+  end
+
+  def to_s
+    "the secret contains the digit '#{digit}'"
+  end
+
+  def test(i)
+    i.to_s.include? digit
+  end
+end
+
+
+
 class GreaterThanFactory
   def try_derive(universe)
     pivot = universe[ rand(universe.size) ]
@@ -219,13 +236,31 @@ class DigitsSumFactory
   end
 end
 
+class HasDigitFactory
+  def try_derive(universe)
+    digit = rand(10)
+    pred = HasDigitPred.new(digit)
+    example = universe.find_index {|u| pred.test(u) }
+    if example
+      counter_example = universe.find_index {|u| !pred.test(u) }
+      if counter_example
+        return pred
+      end
+    end
+    nil
+  end
+end
+
+
 
 WIDTH=4
 range = IntegerWidthPredicate.new(WIDTH)
 universe = range.enumerate
 
 preds = [range]
-factories = [MultipleOfFactory.new, GreaterThanFactory.new, LessThanFactory.new, FirstDigitLessThanLastDigitFactory.new, DigitsSumFactory.new]
+factories = [MultipleOfFactory.new, GreaterThanFactory.new,
+             LessThanFactory.new, FirstDigitLessThanLastDigitFactory.new,
+             DigitsSumFactory.new, HasDigitFactory.new]
 until universe.size < 2
   #$stderr.puts "Universe size: #{universe.size}"
 
@@ -240,8 +275,8 @@ until universe.size < 2
   preds << pred
 end
 
-
-puts "- #{preds.first.to_s}"
+puts "There are #{preds.size} constraints on a secret number."
+puts "First, #{preds.first.to_s}"
 
 count_guesses = 0
 correct = false
@@ -287,9 +322,10 @@ until correct
   # clue
   preds.each do |pred|
     unless pred.test(guess)
+      puts "Ok, I hadn't told you this before, but..."
+      known << pred
       puts "Not #{guess}, because #{pred.to_s}"
       correct = false
-      known << pred
       break
     end
   end
