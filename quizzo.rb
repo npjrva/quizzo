@@ -146,7 +146,7 @@ end
 
 class GreaterThanFactory
   def try_derive(universe)
-    pivot = universe[ rand(universe.size) ]
+    pivot = universe.sample
     pred = GreaterThanPredicate.new(pivot)
     # Confirm that this predicate excludes
     # at least one element from the
@@ -160,7 +160,7 @@ end
 
 class LessThanFactory
   def try_derive(universe)
-    pivot = universe[ rand(universe.size) ]
+    pivot = universe.sample
     pred = LessThanPredicate.new(pivot)
     # Confirm that this predicate excludes
     # at least one element from the
@@ -177,11 +177,11 @@ class MultipleOfFactory
     # Try to choose a factor of
     # some but not all of the numbers
     # in the universe
-    pivot = universe[ rand(universe.size) ]
+    pivot = universe.sample
     factors = find_nontrivial_factors(pivot)
     return nil if factors.empty?
 
-    factor = factors[ rand(factors.size) ]
+    factor = factors.sample
     pred = MultipleOfPredicate.new(factor)
 
     # Confirm that at least one number in the
@@ -226,7 +226,7 @@ end
 
 class DigitsSumFactory
   def try_derive(universe)
-    pivot = universe[ rand(universe.size) ]
+    pivot = universe.sample
     sum = SumOfDigitsPred.hash(pivot)
     pred = SumOfDigitsPred.new(sum)
     counter_example = universe.find_index {|u| !pred.test(u) }
@@ -270,7 +270,7 @@ until universe.size < 2
 
   pred = nil
   while true
-    factory = factories[ rand(factories.size) ]
+    factory = factories.sample
     pred = factory.try_derive(universe)
     break if pred
   end
@@ -297,6 +297,8 @@ until correct
     hints = known.first.enumerate
     puts "Let's see..."
     conjunct = ''
+    # Reorder knowledge, for fun
+    known = [known.first] + known.drop(1).shuffle
     for k in known
       hints = hints.keep_if {|u| k.test(u) }
       puts "#{conjunct}#{k.to_s}, so #{hints.size} possibilities"
@@ -310,7 +312,7 @@ until correct
       puts "type hint again if you really want to know"
       double_hint = true
     else
-      few_hints = hints.sort{|a,b| rand(3)-1}.take(3)
+      few_hints = hints.shuffle.take(3)
       puts "Maybe #{few_hints.join ', '}?"
     end
     next
