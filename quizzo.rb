@@ -112,11 +112,25 @@ class HasDigitPred
   end
 end
 
+class Disjunct
+  def initialize(clauses)
+    @clauses = clauses
+  end
+
+  def to_s
+    "(" + (@clauses.map{|c| c.to_s}.join ", or ") + ")"
+  end
+
+  def test(i)
+    @clauses.each do |c|
+      return true if c.test i
+    end
+    false
+  end
+end
+
 class MultipleOfFactory
   def try_derive(universe)
-    # Try to choose a factor of
-    # some but not all of the numbers
-    # in the universe
     pivot = universe.sample
     factors = find_nontrivial_factors(pivot)
     return nil if factors.empty?
@@ -125,14 +139,11 @@ class MultipleOfFactory
     MultipleOfPredicate.new(factor)
   end
 
-  # Determine the factors of v,
-  # excluding its trivial factors 1, v
   def find_nontrivial_factors(v)
     factors = []
     i=2
     while i*i <= v
       if (v % i) == 0
-        #$stderr.puts "#{i}, #{v/i} are factors of #{v}"
         factors << i
         factors << (v/i)
       end
@@ -162,6 +173,18 @@ class HasDigitFactory
   end
 end
 
+class DisjunctionFactory
+  def initialize(factories)
+    @factories = factories
+  end
+
+  def try_derive(universe)
+    ps = @factories.sample(2).map{|f| f.try_derive universe}
+    return nil if ps.include? nil
+    return Disjunct.new(ps)
+  end
+end
+
 
 width=4
 unless ARGV.empty?
@@ -171,10 +194,12 @@ range = IntegerWidthPredicate.new(width)
 universe = range.enumerate
 
 preds = [range]
-factories = [MultipleOfFactory.new,
+base_factories = [MultipleOfFactory.new,
              FirstDigitLessThanLastDigitFactory.new,
              DigitsSumFactory.new,
              HasDigitFactory.new]
+compound_factories = [ DisjunctionFactory.new(base_factories) ]
+factories = base_factories + compound_factories
 until universe.size < 2
   pred = nil
   while true
