@@ -45,26 +45,26 @@ class MultipleOfPredicate
 end
 
 class FirstDigitLessThanLastDigitPred
-  attr_reader :reverse
-  def initialize(reverse)
-    @reverse = reverse
+  attr_reader :polarity
+  def initialize(polarity)
+    @polarity = polarity
   end
 
   def test(i)
     first_digit = i.to_s[0].to_i
     last_digit = i.to_s[-1].to_i
-    if reverse
-      return first_digit > last_digit
-    else
+    if polarity
       return first_digit < last_digit
+    else
+      return first_digit > last_digit
     end
   end
 
   def to_s
-    if reverse
-      return "the first digit of the secret is greater than the last digit"
-    else
+    if polarity
       return "the first digit of the secret is less than the last digit"
+    else
+      return "the first digit of the secret is greater than the last digit"
     end
   end
 end
@@ -89,25 +89,25 @@ class SumOfDigitsPred
 end
 
 class HasDigitPred
-  attr_reader :digit, :reverse
-  def initialize(digit, reverse)
+  attr_reader :digit, :polarity
+  def initialize(digit, polarity)
     @digit = digit.to_s
-    @reverse = reverse
+    @polarity = polarity
   end
 
   def to_s
-    if reverse
-      "the secret does NOT contain the digit '#{digit}'"
-    else
+    if polarity
       "the secret contains the digit '#{digit}'"
+    else
+      "the secret does NOT contain the digit '#{digit}'"
     end
   end
 
   def test(i)
-    if reverse
-      return !(i.to_s.include? digit)
-    else
+    if polarity
       return i.to_s.include? digit
+    else
+      return !(i.to_s.include? digit)
     end
   end
 end
@@ -122,15 +122,7 @@ class MultipleOfFactory
     return nil if factors.empty?
 
     factor = factors.sample
-    pred = MultipleOfPredicate.new(factor)
-
-    # Confirm that at least one number in the
-    # universe is excluded by this factor
-    counter_example = universe.find_index {|u| !pred.test(u) }
-    if counter_example
-      return pred
-    end
-    nil
+    MultipleOfPredicate.new(factor)
   end
 
   # Determine the factors of v,
@@ -152,15 +144,7 @@ end
 
 class FirstDigitLessThanLastDigitFactory
   def try_derive(universe)
-    pred = FirstDigitLessThanLastDigitPred.new( rand(2) == 0 )
-    example = universe.find_index {|u| pred.test(u) }
-    if example
-      counter_example = universe.find_index {|u| !pred.test(u) }
-      if counter_example
-        return pred
-      end
-    end
-    nil
+    FirstDigitLessThanLastDigitPred.new([false,true].sample)
   end
 end
 
@@ -168,30 +152,15 @@ class DigitsSumFactory
   def try_derive(universe)
     pivot = universe.sample
     sum = SumOfDigitsPred.hash(pivot)
-    pred = SumOfDigitsPred.new(sum)
-    counter_example = universe.find_index {|u| !pred.test(u) }
-    if counter_example
-      return pred
-    end
-    nil
+    SumOfDigitsPred.new(sum)
   end
 end
 
 class HasDigitFactory
   def try_derive(universe)
-    digit = rand(10)
-    pred = HasDigitPred.new(digit, rand(2)==0)
-    example = universe.find_index {|u| pred.test(u) }
-    if example
-      counter_example = universe.find_index {|u| !pred.test(u) }
-      if counter_example
-        return pred
-      end
-    end
-    nil
+    HasDigitPred.new(rand(10), [false,true].sample)
   end
 end
-
 
 
 WIDTH=4
@@ -204,13 +173,20 @@ factories = [MultipleOfFactory.new,
              DigitsSumFactory.new,
              HasDigitFactory.new]
 until universe.size < 2
-  #$stderr.puts "Universe size: #{universe.size}"
-
   pred = nil
   while true
-    factory = factories.sample
-    pred = factory.try_derive(universe)
-    break if pred
+    pred = factories.sample.try_derive(universe)
+    if pred
+      example = universe.find_index {|u| pred.test u}
+      if example
+        # A good predicate selects some elements...
+        counter_example = universe.find_index {|u| !(pred.test u)}
+        if counter_example
+          # ...and rejects others
+          break
+        end
+      end
+    end
   end
 
   universe = universe.keep_if {|u| pred.test(u)}
