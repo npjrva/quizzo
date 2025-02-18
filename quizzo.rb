@@ -163,8 +163,11 @@ class HasDigitFactory
 end
 
 
-WIDTH=4
-range = IntegerWidthPredicate.new(WIDTH)
+width=4
+unless ARGV.empty?
+  width = ARGV.first.to_i
+end
+range = IntegerWidthPredicate.new(width)
 universe = range.enumerate
 
 preds = [range]
@@ -205,6 +208,7 @@ until correct
   puts
   print "#{count_guesses}. What is your guess (or hint or quit)? "
   guess = $stdin.gets.strip.downcase
+  puts
   if guess == 'quit'
     break
   elsif guess == 'hint'
@@ -256,7 +260,7 @@ until correct
     unless pred.test(guess)
       puts "Ok, I hadn't told you this before, but..."
       known << pred
-      puts "Not #{guess}, because #{pred.to_s}"
+      puts "It's not #{guess}, because #{pred.to_s}"
       correct = false
       break
     end
