@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 
-
 class IntegerWidthPredicate
   attr_reader :width
   attr_reader :min, :max_exclusive
@@ -42,36 +41,6 @@ class MultipleOfPredicate
 
   def test(i)
     (i % n) == 0
-  end
-end
-
-class GreaterThanPredicate
-  attr_reader :n
-  def initialize(n)
-    @n = n
-  end
-
-  def to_s
-    "the secret is a greater than #{n}"
-  end
-
-  def test(i)
-    i > n
-  end
-end
-
-class LessThanPredicate
-  attr_reader :n
-  def initialize(n)
-    @n = n
-  end
-
-  def to_s
-    "the secret is a less than #{n}"
-  end
-
-  def test(i)
-    i < n
   end
 end
 
@@ -140,35 +109,6 @@ class HasDigitPred
     else
       return i.to_s.include? digit
     end
-  end
-end
-
-
-class GreaterThanFactory
-  def try_derive(universe)
-    pivot = universe.sample
-    pred = GreaterThanPredicate.new(pivot)
-    # Confirm that this predicate excludes
-    # at least one element from the
-    # universe.  Since universe is stored
-    # in ascending order, we need only check
-    # the first
-    return pred if pred.test(universe.last) and !pred.test(universe.first)
-    nil
-  end
-end
-
-class LessThanFactory
-  def try_derive(universe)
-    pivot = universe.sample
-    pred = LessThanPredicate.new(pivot)
-    # Confirm that this predicate excludes
-    # at least one element from the
-    # universe.  Since universe is stored
-    # in ascending order, we need only check
-    # the last
-    return pred if pred.test(universe.first) and !pred.test(universe.last)
-    nil
   end
 end
 
@@ -260,8 +200,6 @@ universe = range.enumerate
 
 preds = [range]
 factories = [MultipleOfFactory.new,
-             #GreaterThanFactory.new,
-             #LessThanFactory.new,
              FirstDigitLessThanLastDigitFactory.new,
              DigitsSumFactory.new,
              HasDigitFactory.new]
@@ -367,6 +305,4 @@ if correct
     puts "Such as #{hints.take(3).join ', '}"
   end
 end
-
-
 
