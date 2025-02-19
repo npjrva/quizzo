@@ -30,17 +30,26 @@ end
 
 
 class MultipleOfPredicate
-  attr_reader :n
-  def initialize(n)
+  attr_reader :n, :polarity
+  def initialize(n, polarity)
     @n = n
+    @polarity = polarity
   end
 
   def to_s
-    "the secret is a multiple of #{n}"
+    if polarity
+      "the secret is a multiple of #{n}"
+    else
+      "the secret is NOT a multiple of #{n}"
+    end
   end
 
   def test(i)
-    (i % n) == 0
+    if polarity
+      return (i % n) == 0
+    else
+      return (i % n) != 0
+    end
   end
 end
 
@@ -129,27 +138,66 @@ class Disjunct
   end
 end
 
+def find_factors(v)
+  factors = []
+  i=1
+  while i*i <= v
+    if (v % i) == 0
+      factors << i
+      factors << (v/i)
+    end
+    i += 1
+  end
+  factors
+end
+
+def find_nontrivial_factors(v)
+  all_factors = find_factors(v)
+  raise "Error" unless 1==all_factors.shift
+  raise "Error" unless v==all_factors.shift
+  all_factors
+end
+
+def find_proper_divisors(v)
+  find_nontrivial_factors(v) << 1
+end
+
+class AbundantPred
+  attr_reader :polarity
+  def initialize(polarity)
+    @polarity = polarity
+  end
+
+  def to_s
+    if polarity
+      return "the secret's proper divisors are abundant"
+    else
+      return "the secret's proper divisors are deficient"
+    end
+  end
+
+  def test(i)
+    if polarity
+      return find_proper_divisors(i).sum > i
+    else
+      return find_proper_divisors(i).sum < i
+    end
+  end
+end
+
 class MultipleOfFactory
   def try_derive(universe)
     pivot = universe.sample
     factors = find_nontrivial_factors(pivot)
     return nil if factors.empty?
-
     factor = factors.sample
-    MultipleOfPredicate.new(factor)
+    MultipleOfPredicate.new(factor, [false,true].sample)
   end
+end
 
-  def find_nontrivial_factors(v)
-    factors = []
-    i=2
-    while i*i <= v
-      if (v % i) == 0
-        factors << i
-        factors << (v/i)
-      end
-      i += 1
-    end
-    factors
+class AbundantFactory
+  def try_derive(universe)
+    AbundantPred.new([false,true].sample)
   end
 end
 
@@ -197,7 +245,8 @@ preds = [range]
 base_factories = [MultipleOfFactory.new,
              FirstDigitLessThanLastDigitFactory.new,
              DigitsSumFactory.new,
-             HasDigitFactory.new]
+             HasDigitFactory.new,
+             AbundantFactory.new]
 compound_factories = [ DisjunctionFactory.new(base_factories) ]
 factories = base_factories + compound_factories
 until universe.size < 2
