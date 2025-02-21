@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+require 'rainbow'
+
 class IntegerWidthPredicate
   attr_reader :width
   attr_reader :min, :max_exclusive
@@ -269,12 +271,14 @@ until universe.size < 2
 end
 
 puts "There are #{preds.size} constraints on a secret number."
-puts "First, #{preds.first.to_s}"
+
+known = [preds.first]
+puts "The first constraint: #{known.first.to_s}"
+puts "Make some guesses, and I'll reveal more constraints."
 
 count_guesses = 0
 double_hint = false
 correct = false
-known = [preds.first]
 until correct
   count_guesses += 1
   puts
@@ -291,7 +295,7 @@ until correct
     known = [known.first] + known.drop(1).shuffle
     for k in known
       hints = hints.keep_if {|u| k.test(u) }
-      puts "#{conjunct}#{k.to_s}, so #{hints.size} possibilities"
+      puts(conjunct + Rainbow(k.to_s).bg(:yellow) + ", so #{hints.size} possibilities")
       conjunct = 'and, '
     end
 
@@ -303,7 +307,7 @@ until correct
       double_hint = true
     else
       few_hints = hints.shuffle.take(3)
-      puts "Maybe #{few_hints.join ', '}?"
+      puts("Maybe " + Rainbow(few_hints.join ', ').bg(:yellow) + "?")
     end
     next
   end
@@ -316,7 +320,7 @@ until correct
   correct = true
   known.each do |pred|
     unless pred.test(guess)
-      puts "Not #{guess}, because #{pred.to_s}"
+      puts("Not #{guess}, because " + Rainbow(pred.to_s).bg(:red))
       correct = false
     end
   end
@@ -332,7 +336,7 @@ until correct
     unless pred.test(guess)
       puts "Ok, I hadn't told you this before, but..."
       known << pred
-      puts "It's not #{guess}, because #{pred.to_s}"
+      puts("It's not #{guess}, because " + Rainbow(pred.to_s).bg(:green))
       correct = false
       break
     end

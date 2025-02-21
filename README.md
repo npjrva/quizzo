@@ -2,6 +2,11 @@ quizzo
 
 A frustrating math puzzle game.
 
+Prerequisites
+
+  $ gem install rainbow  # provides terminal colors
+
+
 
 Example transcript:
 
