@@ -1,106 +1,90 @@
 quizzo
 
-a frustrating math puzzle game
+A frustrating math puzzle game.
+
 
 Example transcript:
 
 ```
 $ ./quizzo.rb
-There are 7 constraints on a secret number.
+There are 10 constraints on a secret number.
 First, the secret is a 4-digit integer
 
 1. What is your guess (or hint or quit)? 5500
+
 Ok, I hadn't told you this before, but...
-Not 5500, because the digits of the secret sum to 14
+It's not 5500, because the secret is a multiple of 9
 
-2. What is your guess (or hint or quit)? 5522
+2. What is your guess (or hint or quit)? 5502
+
+Not 5502, because the secret is a multiple of 9
+(but you already knew all that)
+
+3. What is your guess (or hint or quit)? 5505
+
+Not 5505, because the secret is a multiple of 9
+(but you already knew all that)
+
+4. What is your guess (or hint or quit)? 5508
+
 Ok, I hadn't told you this before, but...
-Not 5522, because the secret contains the digit '0'
+It's not 5508, because the first digit of the secret is greater than the last digit
 
-3. What is your guess (or hint or quit)? 5504
+5. What is your guess (or hint or quit)? 8055
+
 Ok, I hadn't told you this before, but...
-Not 5504, because the secret is a multiple of 7
+It's not 8055, because the secret's proper divisors are abundant
 
-4. What is your guess (or hint or quit)? 5503
-Not 5503, because the digits of the secret sum to 14
-Not 5503, because the secret is a multiple of 7
-(but you already knew all that)
+6. What is your guess (or hint or quit)? hint
 
-5. What is your guess (or hint or quit)? 5502
-Not 5502, because the digits of the secret sum to 14
-(but you already knew all that)
-
-6. What is your guess (or hint or quit)? 5501
-Not 5501, because the digits of the secret sum to 14
-Not 5501, because the secret is a multiple of 7
-(but you already knew all that)
-
-7. What is your guess (or hint or quit)? 5500
-Not 5500, because the digits of the secret sum to 14
-Not 5500, because the secret is a multiple of 7
-(but you already knew all that)
-
-8. What is your guess (or hint or quit)? 5499
-Not 5499, because the digits of the secret sum to 14
-Not 5499, because the secret contains the digit '0'
-Not 5499, because the secret is a multiple of 7
-(but you already knew all that)
-
-9. What is your guess (or hint or quit)? hint
 Let's see...
 the secret is a 4-digit integer, so 9000 possibilities
-and, the digits of the secret sum to 14, so 465 possibilities
-and, the secret contains the digit '0', so 195 possibilities
-and, the secret is a multiple of 7, so 28 possibilities
-Maybe 3290, 4109, 8204?
+and, the secret is a multiple of 9, so 1000 possibilities
+and, the secret's proper divisors are abundant, so 517 possibilities
+and, the first digit of the secret is greater than the last digit, so 287 possibilities
+Maybe 9936, 9846, 6372?
 
-10. What is your guess (or hint or quit)? 4109
+7. What is your guess (or hint or quit)? 6372
+
 Ok, I hadn't told you this before, but...
-Not 4109, because the first digit of the secret is greater than the last digit
+It's not 6372, because the secret is NOT a multiple of 36
 
-11. What is your guess (or hint or quit)? 8204
+8. What is your guess (or hint or quit)? 9846
+
 Ok, I hadn't told you this before, but...
-Not 8204, because the secret contains the digit '5'
+It's not 9846, because the secret does NOT contain the digit '4'
 
-12. What is your guess (or hint or quit)? hint
+9. What is your guess (or hint or quit)? 9936
+
+Not 9936, because the secret is NOT a multiple of 36
+(but you already knew all that)
+
+10. What is your guess (or hint or quit)? hint
+
 Let's see...
 the secret is a 4-digit integer, so 9000 possibilities
-and, the digits of the secret sum to 14, so 465 possibilities
-and, the secret contains the digit '0', so 195 possibilities
-and, the secret is a multiple of 7, so 28 possibilities
-and, the first digit of the secret is greater than the last digit, so 18 possibilities
-and, the secret contains the digit '5', so 6 possibilities
-Maybe 4550, 5054, 5180?
+and, the secret's proper divisors are abundant, so 2244 possibilities
+and, the first digit of the secret is greater than the last digit, so 1369 possibilities
+and, the secret does NOT contain the digit '4', so 822 possibilities
+and, the secret is NOT a multiple of 36, so 743 possibilities
+and, the secret is a multiple of 9, so 86 possibilities
+Maybe 9702, 5022, 8262?
 
-13. What is your guess (or hint or quit)? 4550
+11. What is your guess (or hint or quit)? 8262
+
 Ok, I hadn't told you this before, but...
-Not 4550, because the secret is a multiple of 1145
+It's not 8262, because the secret is a multiple of 4815
 
-14. What is your guess (or hint or quit)? hint
-Let's see...
-the secret is a 4-digit integer, so 9000 possibilities
-and, the digits of the secret sum to 14, so 465 possibilities
-and, the secret contains the digit '0', so 195 possibilities
-and, the secret is a multiple of 7, so 28 possibilities
-and, the first digit of the secret is greater than the last digit, so 18 possibilities
-and, the secret contains the digit '5', so 6 possibilities
-and, the secret is a multiple of 1145, so 1 possibilities
-I don't want to spoil the surpise
-type hint again if you really want to know
+12. What is your guess (or hint or quit)? 4815
 
-15. What is your guess (or hint or quit)? hint
-Let's see...
-the secret is a 4-digit integer, so 9000 possibilities
-and, the digits of the secret sum to 14, so 465 possibilities
-and, the secret contains the digit '0', so 195 possibilities
-and, the secret is a multiple of 7, so 28 possibilities
-and, the first digit of the secret is greater than the last digit, so 18 possibilities
-and, the secret contains the digit '5', so 6 possibilities
-and, the secret is a multiple of 1145, so 1 possibilities
-Maybe 8015?
+Not 4815, because the secret's proper divisors are abundant
+Not 4815, because the first digit of the secret is greater than the last digit
+Not 4815, because the secret does NOT contain the digit '4'
+(but you already knew all that)
 
-16. What is your guess (or hint or quit)? 8015
-The answer was 8015.
-Great job,
-You solved it in 16 guesses (versus 7 clues)
+13. What is your guess (or hint or quit)? 9630
+
+The answer was 9630.
+Great job, 
+You solved it in 13 guesses (versus 10 clues)
 ```

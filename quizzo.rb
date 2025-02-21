@@ -250,23 +250,21 @@ base_factories = [MultipleOfFactory.new,
 compound_factories = [ DisjunctionFactory.new(base_factories) ]
 factories = base_factories + compound_factories
 until universe.size < 2
+  # Ask a random factory to derive a predicate
+  # and confirm that the predicate refines the
+  # universe into a smaller (but non-empty) universe
+  refined_universe = nil
   pred = nil
   while true
     pred = factories.sample.try_derive(universe)
-    if pred
-      example = universe.find_index {|u| pred.test u}
-      if example
-        # A good predicate selects some elements...
-        counter_example = universe.find_index {|u| !(pred.test u)}
-        if counter_example
-          # ...and rejects others
-          break
-        end
-      end
-    end
+    next if pred==nil
+    refined_universe = universe.select {|u| pred.test u}
+    next if refined_universe.empty?
+    next if refined_universe.size == universe.size
+    break
   end
 
-  universe = universe.keep_if {|u| pred.test(u)}
+  universe = refined_universe
   preds << pred
 end
 
