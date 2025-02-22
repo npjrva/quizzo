@@ -146,7 +146,8 @@ def find_factors(v)
   while i*i <= v
     if (v % i) == 0
       factors << i
-      factors << (v/i)
+      j = v/i
+      factors << j unless j==i
     end
     i += 1
   end
