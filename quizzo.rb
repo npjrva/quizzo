@@ -360,11 +360,11 @@ until universe.size < 2
   preds << pred
 end
 
-puts "There are #{preds.size} constraints on a secret number."
+puts "There are #{preds.size} secret constraints the define a unique, secret number."
 
 known = [preds.first]
 puts "The first constraint: " + Rainbow(known.first.to_s).bg(:green)
-puts "Make some guesses, and I'll reveal more constraints."
+puts "Make guesses and I'll reveal more constraints."
 
 count_rounds = 0
 double_hint = false
@@ -417,7 +417,7 @@ until correct
     end
   end
   if !correct
-    puts "(but you already knew all that)"
+    puts "You already knew all that"
     next
   end
 
@@ -426,7 +426,8 @@ until correct
   # clue
   preds.each do |pred|
     unless pred.test(guess)
-      puts "Ok, I hadn't told you this before, but..."
+      puts "Good!  #{guess} passes all the constraints you knew already..."
+      puts "So I reveal another constraint:"
       known << pred
       puts("It's not #{guess}, because " + Rainbow(pred.to_s).bg(:green))
       puts " but #{pred.refute(guess)}"
