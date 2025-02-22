@@ -15,6 +15,10 @@ class IntegerWidthPredicate
     "the secret is a #{width}-digit integer"
   end
 
+  def refute(i)
+    "#{i} has #{i.to_s.size} digits"
+  end
+
   def test(i)
     min <= i and i < max_exclusive
   end
@@ -46,6 +50,16 @@ class MultipleOfPredicate
     end
   end
 
+  def refute(i)
+    lb = (i/n).to_i
+    if polarity
+      "#{lb}*#{n} == #{lb*n} < #{i} < #{(lb+1)*n} == #{lb+1}*#{n}"
+    else
+      "#{lb}*#{n} == #{i}"
+    end
+  end
+
+
   def test(i)
     if polarity
       return (i % n) == 0
@@ -62,9 +76,18 @@ class FirstDigitsLessThanLastDigitsPred
     @polarity = polarity
   end
 
+  def prefix(i)
+    i.to_s[0 ... subsequence_length].to_i
+  end
+
+  def suffix(i)
+    i.to_s.reverse[0 ... subsequence_length].reverse.to_i
+  end
+
   def test(i)
-    first_digits = i.to_s[0 ... subsequence_length].to_i
-    last_digits = i.to_s.reverse[0 ... subsequence_length].reverse.to_i
+    first_digits = prefix(i)
+    last_digits = suffix(i)
+
     if polarity
       return first_digits < last_digits
     else
@@ -87,6 +110,17 @@ class FirstDigitsLessThanLastDigitsPred
       end
     end
   end
+
+  def refute(i)
+    first_digits = prefix(i)
+    last_digits = suffix(i)
+    if polarity
+      "#{first_digits}_ is not less than _#{last_digits}"
+    else
+      "#{first_digits}_ is not greater than _#{last_digits}"
+    end
+  end
+
 end
 
 class SumOfDigitsPred
@@ -106,6 +140,10 @@ class SumOfDigitsPred
   def self.hash(n)
     n.to_s.split(//).map{|c| c.to_i}.sum
   end
+
+  def refute(i)
+    "the digits of #{i} sum to #{SumOfDigitsPred.hash(i)} == #{i.to_s.split(//).join(' + ')}"
+  end
 end
 
 class HasDigitPred
@@ -120,6 +158,14 @@ class HasDigitPred
       "the secret contains the digit '#{digit}'"
     else
       "the secret does NOT contain the digit '#{digit}'"
+    end
+  end
+
+  def refute(i)
+    if polarity
+      return "#{i} doesn't include '#{digit}'"
+    else
+      return "#{i} includes '#{digit}'"
     end
   end
 
@@ -139,6 +185,11 @@ class Disjunct
 
   def to_s
     "(" + (@clauses.map{|c| c.to_s}.join ", or ") + ")"
+  end
+
+  def refute(i)
+    refutes = @clauses.map{|c| c.refute i}
+    "none hold: #{refutes.join('; ')}"
   end
 
   def test(i)
@@ -185,6 +236,15 @@ class AbundantPred
       return "the secret's proper divisors are abundant"
     else
       return "the secret's proper divisors are deficient"
+    end
+  end
+
+  def refute(i)
+    pds = find_proper_divisors(i).sort
+    if polarity
+      "#{i} is greater than the sum #{pds.sum} of its proper divisors #{pds.join ' + '}"
+    else
+      "#{i} is less than the sum #{pds.sum} of its proper divisors #{pds.join ' + '}"
     end
   end
 
@@ -340,6 +400,7 @@ until correct
   known.each do |pred|
     unless pred.test(guess)
       puts("Not #{guess}, because " + Rainbow(pred.to_s).bg(:red))
+      puts " but #{pred.refute(guess)}"
       correct = false
     end
   end
@@ -356,6 +417,7 @@ until correct
       puts "Ok, I hadn't told you this before, but..."
       known << pred
       puts("It's not #{guess}, because " + Rainbow(pred.to_s).bg(:green))
+      puts " but #{pred.refute(guess)}"
       correct = false
       break
     end
@@ -378,7 +440,7 @@ for k in known
 end
 if hints.size > 1
   puts "Given what you knew so far, there are #{hints.size} possible solutions"
-  hints.erase(universe.first)
+  hints.delete universe.first
   puts "Such as #{hints.take(3).join ', '}"
 end
 
