@@ -242,9 +242,9 @@ class AbundantPred
   def refute(i)
     pds = find_proper_divisors(i).sort
     if polarity
-      "#{i} is greater than the sum #{pds.sum} of its proper divisors #{pds.join ' + '}"
+      "#{i} is not less than the sum #{pds.sum} of its proper divisors #{pds.join ' + '}"
     else
-      "#{i} is less than the sum #{pds.sum} of its proper divisors #{pds.join ' + '}"
+      "#{i} is not greater than the sum #{pds.sum} of its proper divisors #{pds.join ' + '}"
     end
   end
 
