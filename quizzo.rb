@@ -81,9 +81,9 @@ class FirstDigitsLessThanLastDigitsPred
       end
     else
       if polarity
-        return "the first #{subsequence_length} digits of the secret comprise a number less than the last #{subsequence_length} digits"
+        return "the first #{subsequence_length} digits of the secret form a number less than the last #{subsequence_length} digits"
       else
-        return "the first #{subsequence_length} digits of the secret comprise a number greater than the last #{subsequence_length} digits"
+        return "the first #{subsequence_length} digits of the secret form a number greater than the last #{subsequence_length} digits"
       end
     end
   end
@@ -267,6 +267,8 @@ base_factories = [MultipleOfFactory.new,
              AbundantFactory.new]
 compound_factories = [ DisjunctionFactory.new(base_factories) ]
 factories = base_factories + compound_factories
+
+print "...thinking...\r"
 until universe.size < 2
   # Ask a random factory to derive a predicate
   # and confirm that the predicate refines the
@@ -310,7 +312,8 @@ until correct
     # Reorder knowledge, for fun
     known = [known.first] + known.drop(1).shuffle
     for k in known
-      hints = hints.keep_if {|u| k.test(u) }
+      print "...thinking...\r"
+      hints = hints.select {|u| k.test(u) }
       puts(conjunct + Rainbow(k.to_s).bg(:yellow) + ", so #{hints.size} possibilities")
       conjunct = 'and, '
     end
