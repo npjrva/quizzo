@@ -76,12 +76,21 @@ class FirstDigitsLessThanLastDigitsPred
     @polarity = polarity
   end
 
+  def prefix_s(i)
+    i.to_s[0 ... subsequence_length]
+  end
+
+
   def prefix(i)
-    i.to_s[0 ... subsequence_length].to_i
+    prefix_s(i).to_i
+  end
+
+  def suffix_s(i)
+    i.to_s.reverse[0 ... subsequence_length].reverse
   end
 
   def suffix(i)
-    i.to_s.reverse[0 ... subsequence_length].reverse.to_i
+    suffix_s(i).to_i
   end
 
   def test(i)
@@ -112,12 +121,15 @@ class FirstDigitsLessThanLastDigitsPred
   end
 
   def refute(i)
-    first_digits = prefix(i)
-    last_digits = suffix(i)
+    total_length = i.to_s.size
+    blanks_length = total_length - subsequence_length
+    blanks = '_' * blanks_length
+    first_digits = prefix_s(i)
+    last_digits = suffix_s(i)
     if polarity
-      "#{first_digits}_ is not less than _#{last_digits}"
+      "#{first_digits}#{blanks} is not less than #{blanks}#{last_digits}"
     else
-      "#{first_digits}_ is not greater than _#{last_digits}"
+      "#{first_digits}#{blanks} is not greater than #{blanks}#{last_digits}"
     end
   end
 
@@ -184,12 +196,12 @@ class Disjunct
   end
 
   def to_s
-    "(" + (@clauses.map{|c| c.to_s}.join ", or ") + ")"
+    "(" + (@clauses.map{|c| c.to_s}.join "; or, ") + ")"
   end
 
   def refute(i)
     refutes = @clauses.map{|c| c.refute i}
-    "none hold: #{refutes.join('; ')}"
+    "none hold: #{refutes.join('; and, ')}"
   end
 
   def test(i)
