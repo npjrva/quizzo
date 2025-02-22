@@ -55,27 +55,36 @@ class MultipleOfPredicate
   end
 end
 
-class FirstDigitLessThanLastDigitPred
-  attr_reader :polarity
-  def initialize(polarity)
+class FirstDigitsLessThanLastDigitsPred
+  attr_reader :subsequence_length, :polarity
+  def initialize(subsequence_length, polarity)
+    @subsequence_length = subsequence_length
     @polarity = polarity
   end
 
   def test(i)
-    first_digit = i.to_s[0].to_i
-    last_digit = i.to_s[-1].to_i
+    first_digits = i.to_s[0 ... subsequence_length].to_i
+    last_digits = i.to_s.reverse[0 ... subsequence_length].reverse.to_i
     if polarity
-      return first_digit < last_digit
+      return first_digits < last_digits
     else
-      return first_digit > last_digit
+      return first_digits > last_digits
     end
   end
 
   def to_s
-    if polarity
-      return "the first digit of the secret is less than the last digit"
+    if @subsequence_length == 1
+      if polarity
+        return "the first digit of the secret is less than the last digit"
+      else
+        return "the first digit of the secret is greater than the last digit"
+      end
     else
-      return "the first digit of the secret is greater than the last digit"
+      if polarity
+        return "the first #{subsequence_length} digits of the secret comprise a number less than the last #{subsequence_length} digits"
+      else
+        return "the first #{subsequence_length} digits of the secret comprise a number greater than the last #{subsequence_length} digits"
+      end
     end
   end
 end
@@ -204,9 +213,15 @@ class AbundantFactory
   end
 end
 
-class FirstDigitLessThanLastDigitFactory
+class FirstDigitsLessThanLastDigitsFactory
+  attr_reader :width
+  def initialize(width)
+    @width = width
+  end
+
   def try_derive(universe)
-    FirstDigitLessThanLastDigitPred.new([false,true].sample)
+    subsequence_length = 1 + rand(width-1)
+    FirstDigitsLessThanLastDigitsPred.new(subsequence_length, [false,true].sample)
   end
 end
 
@@ -246,7 +261,7 @@ universe = range.enumerate
 
 preds = [range]
 base_factories = [MultipleOfFactory.new,
-             FirstDigitLessThanLastDigitFactory.new,
+             FirstDigitsLessThanLastDigitsFactory.new(width),
              DigitsSumFactory.new,
              HasDigitFactory.new,
              AbundantFactory.new]
