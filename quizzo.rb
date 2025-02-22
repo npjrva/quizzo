@@ -12,7 +12,7 @@ class IntegerWidthPredicate
   end
 
   def to_s
-    "the secret is a #{width}-digit integer"
+    "the secret number is a #{width}-digit integer"
   end
 
   def refute(i)
@@ -44,9 +44,9 @@ class MultipleOfPredicate
 
   def to_s
     if polarity
-      "the secret is a multiple of #{n}"
+      "the secret number is a multiple of #{n}"
     else
-      "the secret is NOT a multiple of #{n}"
+      "the secret number is NOT a multiple of #{n}"
     end
   end
 
@@ -107,15 +107,15 @@ class FirstDigitsLessThanLastDigitsPred
   def to_s
     if @subsequence_length == 1
       if polarity
-        return "the first digit of the secret is less than the last digit"
+        return "the first digit of the secret number is less than the last digit"
       else
-        return "the first digit of the secret is greater than the last digit"
+        return "the first digit of the secret number is greater than the last digit"
       end
     else
       if polarity
-        return "the first #{subsequence_length} digits of the secret form a number less than the last #{subsequence_length} digits"
+        return "the first #{subsequence_length} digits of the secret number form a number less than the last #{subsequence_length} digits"
       else
-        return "the first #{subsequence_length} digits of the secret form a number greater than the last #{subsequence_length} digits"
+        return "the first #{subsequence_length} digits of the secret number form a number greater than the last #{subsequence_length} digits"
       end
     end
   end
@@ -142,7 +142,7 @@ class SumOfDigitsPred
   end
 
   def to_s
-    "the digits of the secret sum to #{sum}"
+    "the digits of the secret number sum to #{sum}"
   end
 
   def test(i)
@@ -167,9 +167,9 @@ class HasDigitPred
 
   def to_s
     if polarity
-      "the secret contains the digit '#{digit}'"
+      "the secret number contains the digit '#{digit}'"
     else
-      "the secret does NOT contain the digit '#{digit}'"
+      "the secret number does NOT contain the digit '#{digit}'"
     end
   end
 
@@ -245,9 +245,9 @@ class AbundantPred
 
   def to_s
     if polarity
-      return "the secret's proper divisors are abundant"
+      return "the secret number's proper divisors are abundant"
     else
-      return "the secret's proper divisors are deficient"
+      return "the secret number's proper divisors are deficient"
     end
   end
 
@@ -360,11 +360,11 @@ until universe.size < 2
   preds << pred
 end
 
-puts "There are #{preds.size} secret constraints the define a unique, secret number."
+puts "There are #{preds.size} secret constraints that define a unique, secret number."
 
 known = [preds.first]
 puts "The first constraint: " + Rainbow(known.first.to_s).bg(:green)
-puts "Make guesses and I'll reveal more constraints."
+puts "Guess at the number and I'll reveal more constraints."
 
 count_rounds = 0
 double_hint = false
@@ -437,7 +437,7 @@ until correct
   end
 end
 
-puts "The secret was #{universe.first}."
+puts "The secret number was #{universe.first}."
 if correct
   print(Rainbow("Great job").bg(:green) + ", ")
   if count_rounds == 1
@@ -452,8 +452,8 @@ for k in known
   hints = hints.keep_if {|u| k.test(u) }
 end
 if hints.size > 1
-  puts "Given what you knew so far, there are #{hints.size} possible solutions"
+  puts "Given the constraints you know so far, there are #{hints.size} possible secret numbers"
   hints.delete universe.first
-  puts "Such as #{hints.take(3).join ', '}"
+  puts "Such as #{hints.shuffle.take(3).join ', '}"
 end
 
