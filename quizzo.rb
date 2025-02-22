@@ -378,6 +378,7 @@ for k in known
 end
 if hints.size > 1
   puts "Given what you knew so far, there are #{hints.size} possible solutions"
+  hints.erase(universe.first)
   puts "Such as #{hints.take(3).join ', '}"
 end
 
