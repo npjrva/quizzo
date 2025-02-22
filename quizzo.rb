@@ -273,7 +273,7 @@ end
 puts "There are #{preds.size} constraints on a secret number."
 
 known = [preds.first]
-puts "The first constraint: #{known.first.to_s}"
+puts "The first constraint: " + Rainbow(known.first.to_s).bg(:green)
 puts "Make some guesses, and I'll reveal more constraints."
 
 count_guesses = 0
@@ -349,7 +349,7 @@ if correct
   if count_guesses == 1
     puts "You solved it on your first try"
   else
-    puts "You solved it in #{count_guesses} guesses (versus #{preds.size} clues)"
+    puts "You solved it in #{count_guesses} guesses (versus #{known.size} known / #{preds.size} constraints)"
   end
 
   hints = known.first.enumerate
