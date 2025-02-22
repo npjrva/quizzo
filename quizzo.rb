@@ -277,13 +277,13 @@ known = [preds.first]
 puts "The first constraint: " + Rainbow(known.first.to_s).bg(:green)
 puts "Make some guesses, and I'll reveal more constraints."
 
-count_guesses = 0
+count_rounds = 0
 double_hint = false
 correct = false
 until correct
-  count_guesses += 1
+  count_rounds += 1
   puts
-  print "#{count_guesses}. What is your guess (or hint or quit)? "
+  print "#{count_rounds}. What is your guess (or hint or quit)? "
   guess = $stdin.gets.strip.downcase
   puts
   if guess == 'quit'
@@ -344,22 +344,22 @@ until correct
   end
 end
 
-puts "The answer was #{universe.first}."
+puts "The secret was #{universe.first}."
 if correct
-  puts "Great job, "
-  if count_guesses == 1
+  print(Rainbow("Great job").bg(:green) + ", ")
+  if count_rounds == 1
     puts "You solved it on your first try"
   else
-    puts "You solved it in #{count_guesses} guesses (versus #{known.size} known / #{preds.size} constraints)"
+    puts "You solved it in #{count_rounds} rounds (versus #{known.size} known / #{preds.size} constraints)"
   end
+end
 
-  hints = known.first.enumerate
-  for k in known
-    hints = hints.keep_if {|u| k.test(u) }
-  end
-  if hints.size > 1
-    puts "Given what you knew so far, there are #{hints.size} possible solutions"
-    puts "Such as #{hints.take(3).join ', '}"
-  end
+hints = known.first.enumerate
+for k in known
+  hints = hints.keep_if {|u| k.test(u) }
+end
+if hints.size > 1
+  puts "Given what you knew so far, there are #{hints.size} possible solutions"
+  puts "Such as #{hints.take(3).join ', '}"
 end
 
