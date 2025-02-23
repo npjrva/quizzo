@@ -122,6 +122,9 @@ class FirstDigitsLessThanLastDigitsPred
 
   def refute(i)
     total_length = i.to_s.size
+    if total_length < subsequence_length
+      return "#{i} doesn't even have #{subsequence_length} digits"
+    end
     blanks_length = total_length - subsequence_length
     blanks = '_' * blanks_length
     first_digits = prefix_s(i)
@@ -196,7 +199,7 @@ class Disjunct
   end
 
   def to_s
-    "(" + (@clauses.map{|c| c.to_s}.join "; or, ") + ")"
+    "( " + (@clauses.map{|c| c.to_s}.join "; or, ") + " )"
   end
 
   def refute(i)
@@ -366,15 +369,17 @@ known = [preds.first]
 puts "The first constraint: " + Rainbow(known.first.to_s).bg(:green)
 puts "Guess at the number and I'll reveal more constraints."
 
-count_rounds = 0
+count_rounds = 1
+count_hints = 0
 double_hint = false
 correct = false
 until correct
-  count_rounds += 1
   puts
   print "#{count_rounds}. What is your guess (or hint or quit)? "
   guess = $stdin.gets.strip.downcase
   puts
+  next if guess.empty?
+  count_rounds += 1
   if guess == 'quit'
     break
   elsif guess == 'hint'
@@ -399,6 +404,7 @@ until correct
     else
       few_hints = hints.shuffle.take(3)
       puts("Maybe " + Rainbow(few_hints.join ', ').bg(:yellow) + "?")
+      count_hints += 1
     end
     next
   end
@@ -444,6 +450,7 @@ if correct
     puts "You solved it on your first try"
   else
     puts "You solved it in #{count_rounds} rounds (versus #{known.size} known / #{preds.size} constraints)"
+    puts "and #{count_hints} hints" if count_hints > 0
   end
 end
 
