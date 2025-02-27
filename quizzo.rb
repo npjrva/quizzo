@@ -380,9 +380,9 @@ until correct
   puts
   next if guess.empty?
   count_rounds += 1
-  if guess == 'quit'
+  if 'quit'.start_with? guess
     break
-  elsif guess == 'hint'
+  elsif 'hint'.start_with? guess
     hints = known.first.enumerate
     puts "Let's see..."
     conjunct = ''
@@ -410,6 +410,7 @@ until correct
   end
 
   double_hint = false
+  next unless guess =~ /^\d+$/
   guess = guess.to_i
 
   # Check the input against all the clues,
